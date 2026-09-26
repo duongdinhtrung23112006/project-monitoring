@@ -1,0 +1,4 @@
+Ubuntu Server
+Git
+GitHub
+Nginx
