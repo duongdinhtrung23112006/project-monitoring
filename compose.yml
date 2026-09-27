@@ -11,9 +11,13 @@ services:
       MYSQL_ROOT_PASSWORD: root_password
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
-
   wordpress:
     image: wordpress:php8.2-apache
     container_name: monitoring-wordpress
@@ -28,7 +32,8 @@ services:
     volumes:
       - wordpress_data:/var/www/html
     depends_on:
-      - mysql
+        mysql:
+         condition: service_healthy
     networks:
       - app-network
 
