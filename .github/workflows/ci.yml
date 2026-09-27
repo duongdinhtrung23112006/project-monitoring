@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Kiểm tra Docker Compose
+        run: docker compose config
