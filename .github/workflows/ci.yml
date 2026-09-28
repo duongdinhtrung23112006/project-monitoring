@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -27,11 +27,34 @@ jobs:
       - name: Kiểm tra Docker Compose
         run: docker compose config
 
-      - name: Khởi động hệ thống
+      - name: Khởi động để kiểm tra
         run: docker compose up -d
 
       - name: Kiểm tra container
         run: docker compose ps
 
-      - name: Dừng hệ thống
+      - name: Dừng hệ thống kiểm thử
         run: docker compose down
+
+  deploy:
+    runs-on: self-hosted
+    needs: check-compose
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Tạo file cấu hình
+        env:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        run: |
+          echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
+          echo "MYSQL_USER=$MYSQL_USER" >> .env
+          echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
+          echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> .env
+
+      - name: Triển khai hệ thống
+        run: docker compose up -d
